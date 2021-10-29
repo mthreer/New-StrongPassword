@@ -1,0 +1,7 @@
+### Ignore all sensitive data
+*.sensitive.*
+*.confidential.*
+
+### .gitignore
+!.gitignore
+!*/

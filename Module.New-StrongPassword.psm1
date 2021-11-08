@@ -53,7 +53,7 @@ function New-StrongPassword {
         SOFTWARE.
 
         AUTHOR: Niklas J. MacDowall (niklasjumlin [at] gmail [dot] com)
-        LASTEDIT: Oct 29, 2021
+        LASTEDIT: Nov 08, 2021
     .LINK
         http://blog.jumlin.com
     #>
@@ -68,7 +68,14 @@ function New-StrongPassword {
             HelpMessage = "Provide how many passwords that should be generated"
         )]
         [ValidateNotNullorEmpty()]
-        [ValidateScript({$_ -ge 1},ErrorMessage="Count value must greater than {0}")]
+        #[ValidateScript({$_ -ge 1},ErrorMessage="Count value must be greater than {0}")]
+        [ValidateScript({
+            if (-not($_ -ge 1)) { 
+                throw "Count value must be greater than $($_)"
+            } else { 
+                return $true
+            }
+        })]
         [Int]$Count = 1,
         
         [Parameter(
@@ -76,7 +83,14 @@ function New-StrongPassword {
             ValueFromPipelineByPropertyName = $True,
             HelpMessage = "Provide the desired length"
         )]
-        [ValidateScript({$_ -ge 1},ErrorMessage="Length value must greater than {0}")]
+        #[ValidateScript({$_ -ge 1},ErrorMessage="Length value must be greater than {0}")]
+        [ValidateScript({
+            if (-not($_ -ge 1)) {
+                throw "Length value must be greater than $($_)"
+            } else {
+                return $true
+            }
+        })]
         [Int]$Length = 16,
         
         [Parameter(
@@ -107,7 +121,13 @@ function New-StrongPassword {
             Mandatory = $False, 
             HelpMessage = "Exclude special characters or not"
         )]
-        [Switch]$ExcludeSpecialCharacters
+        [Switch]$ExcludeSpecialCharacters,
+
+        [Parameter(
+            Mandatory = $False, 
+            HelpMessage = "Specify special characters to include. (Default: !`"#$%&''()*+,-./:;<=>?@[\]^_`{|}~)"
+        )]
+        [string]$Specials
     )
 
     Begin {
@@ -126,8 +146,16 @@ function New-StrongPassword {
         #$AllNumbers = (48..57) | % { [char]$_ }
         $AllNumbers = (0..9)
 
-        # Specials: !#$%&()*+,-./:;<=>?@[\]^_
-        $AllSpecials = (33,35) + (36..38) + (40..47) + (58..64) + (91..95) | % {[char]$_}
+        # Specials: !"#$%&'()*+,-./:;<=>?@[\]^_`{}|~
+        $AllSpecials = @{}
+        (33..47) + (58..64) + (91..96) + (123..126) | % { $AllSpecials.[char]$_ = [byte]$_ }
+        if ((-not($ExcludeSpecialCharacters)) -and $Specials) {
+            $CharSelection = foreach ($char in $Specials.ToCharArray()) {
+                $AllSpecials.GetEnumerator().Where{$_.Key -eq "$char"}.Value
+                if (-not($char -in $AllSpecials.Keys)) { Write-Warning "Unsupported special character included: `'$char`' (This will not be included)" }
+            }
+            $AllSpecials = $CharSelection | % { [char]$_ }
+        }
 
         $Selection=@()
         if (-not($ExcludeUppercaseLetters)) { 

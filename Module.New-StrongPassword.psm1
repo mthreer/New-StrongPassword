@@ -53,7 +53,7 @@ function New-StrongPassword {
         SOFTWARE.
 
         AUTHOR: Niklas J. MacDowall (niklasjumlin [at] gmail [dot] com)
-        LASTEDIT: Nov 08, 2021
+        LASTEDIT: Jan 13, 2022
     .LINK
         http://blog.jumlin.com
     #>
@@ -150,6 +150,7 @@ function New-StrongPassword {
         $AllSpecials = @{}
         (33..47) + (58..64) + (91..96) + (123..126) | % { $AllSpecials.[char]$_ = [byte]$_ }
 
+        # if user has not excluded special characters AND has chosen custom special characters to be used
         if ((-not($ExcludeSpecialCharacters)) -and $Specials) {
 
             # Verify selected specials chars from available specials chars
@@ -211,4 +212,5 @@ function New-StrongPassword {
     END {
         [PSCustomObject]$NewPasswords
     }
+
 }

@@ -149,12 +149,20 @@ function New-StrongPassword {
         # Specials: !"#$%&'()*+,-./:;<=>?@[\]^_`{}|~
         $AllSpecials = @{}
         (33..47) + (58..64) + (91..96) + (123..126) | % { $AllSpecials.[char]$_ = [byte]$_ }
+
         if ((-not($ExcludeSpecialCharacters)) -and $Specials) {
+
+            # Verify selected specials chars from available specials chars
             $CharSelection = foreach ($char in $Specials.ToCharArray()) {
                 $AllSpecials.GetEnumerator().Where{$_.Key -eq "$char"}.Value
                 if (-not($char -in $AllSpecials.Keys)) { Write-Warning "Unsupported special character included: `'$char`' (This will not be included)" }
             }
+
+            # Set special characters to the user-selected special characters
             $AllSpecials = $CharSelection | % { [char]$_ }
+        } else {
+            # Since our original collection was a hashtable with key + value pairs, lets just grab the key labels
+            $AllSpecials = $AllSpecials.Keys
         }
 
         $Selection=@()
@@ -170,6 +178,7 @@ function New-StrongPassword {
         if (-not($ExcludeSpecialCharacters)) { 
             $Selection = $Selection + $AllSpecials
         }
+
 
     }
     PROCESS {

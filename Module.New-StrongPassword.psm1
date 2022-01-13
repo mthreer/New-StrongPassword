@@ -85,7 +85,7 @@ function New-StrongPassword {
         )]
         #[ValidateScript({$_ -ge 1},ErrorMessage="Length value must be greater than {0}")]
         [ValidateScript({
-            if (-not($_ -ge 1)) {
+            if (-not($_ -ge 6)) {
                 throw "Length value must be greater than $($_)"
             } else {
                 return $true
@@ -130,7 +130,7 @@ function New-StrongPassword {
         [string]$Specials
     )
 
-    Begin {
+    BEGIN {
         if ( ($ExcludeUppercaseLetters) -and ($ExcludeLowercaseLetters) -and ($ExcludeNumbers) -and ($ExcludeSpecialCharacters) ) {
             Write-Error "You must select at least one character type to be included in the generation. These can be either lowercase letters, uppercase letters, numbers or specials or all of them together."
             Continue
@@ -172,7 +172,7 @@ function New-StrongPassword {
         }
 
     }
-    Process {
+    PROCESS {
         try {
             if ($Count -eq "1") {
                 $NewPasswords = ($Selection | Get-Random -Count $Length) -join ""
@@ -199,7 +199,7 @@ function New-StrongPassword {
             Write-Error $_.Exception.Message
         }
     }
-    End {
+    END {
         [PSCustomObject]$NewPasswords
     }
 }

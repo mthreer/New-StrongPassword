@@ -137,10 +137,10 @@ function New-StrongPassword {
         }
 
         # Alphabet: Uppercase
-        $AllUppercaseLetters = (65..90) | % {[char]$_}
+        $AllUppercaseLetters = (65..90) | ForEach-Object {[char]$_}
 
         # Alphabet: Lowercase
-        $AllLowercaseLetters = (97..122) | % {[char]$_}
+        $AllLowercaseLetters = (97..122) | ForEach-Object {[char]$_}
 
         # Digits: 0-9 
         #$AllNumbers = (48..57) | % { [char]$_ }
@@ -212,5 +212,4 @@ function New-StrongPassword {
     END {
         [PSCustomObject]$NewPasswords
     }
-
 }

@@ -53,7 +53,7 @@ function New-StrongPassword {
         SOFTWARE.
 
         AUTHOR: Niklas J. MacDowall (niklasjumlin [at] gmail [dot] com)
-        LASTEDIT: Jan 13, 2022
+        LASTEDIT: May 09, 2023
     .LINK
         http://blog.jumlin.com
     #>
@@ -148,7 +148,7 @@ function New-StrongPassword {
 
         # Specials: !"#$%&'()*+,-./:;<=>?@[\]^_`{}|~
         $AllSpecials = @{}
-        (33..47) + (58..64) + (91..96) + (123..126) | % { $AllSpecials.[char]$_ = [byte]$_ }
+        (33..47) + (58..64) + (91..96) + (123..126) | ForEach-Object { $AllSpecials.[char]$_ = [byte]$_ }
 
         # if user has not excluded special characters AND has chosen custom special characters to be used
         if ((-not($ExcludeSpecialCharacters)) -and $Specials) {
@@ -160,7 +160,7 @@ function New-StrongPassword {
             }
 
             # Set special characters to the user-selected special characters
-            $AllSpecials = $CharSelection | % { [char]$_ }
+            $AllSpecials = $CharSelection | ForEach-Object { [char]$_ }
         } else {
             # Since our original collection was a hashtable with key + value pairs, lets just grab the key labels
             $AllSpecials = $AllSpecials.Keys
